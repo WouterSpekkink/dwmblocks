@@ -19,7 +19,7 @@ void replace(char *str, char old, char new);
 void remove_all(char *str, char to_remove);
 void getcmds(int time);
 #ifndef __OpenBSD__
-void getsigcmds(unsigned int signal);
+void getsigcmds(int signal);
 void setupsignals();
 void sighandler(int signum);
 #endif
@@ -78,7 +78,7 @@ void getcmd(const Block *block, char *output)
 	fgets(output+i, CMDLENGTH-(strlen(delim)+1), cmdf);
         remove_all(output, '\n');
 	i = strlen(output);
-        if ((i > 0 && block != &blocks[LENGTH(blocks) - 1]))
+        if (i > 0 && block != &blocks[LENGTH(blocks) - 1])
             strcat(output, delim);
         i+=strlen(delim);
         output[i++] = '\0';
@@ -88,18 +88,20 @@ void getcmd(const Block *block, char *output)
 void getcmds(int time)
 {
 	const Block* current;
-	for (int i = 0; i < LENGTH(blocks); i++) {
-		current = blocks + i;
+	for (int i = 0; i < LENGTH(blocks); i++) 
+        {
+        	current = blocks + i;
 		if ((current->interval != 0 && time % current->interval == 0) || time == -1)
 			getcmd(current,statusbar[i]);
 	}
 }
 
 #ifndef __OpenBSD__
-void getsigcmds(unsigned int signal)
+void getsigcmds(int signal)
 {
 	const Block *current;
-	for (unsigned int i = 0; i < LENGTH(blocks); i++) {
+	for (int i = 0; i < LENGTH(blocks); i++) 
+        {
 		current = blocks + i;
 		if (current->signal == signal)
 			getcmd(current,statusbar[i]);
@@ -181,6 +183,7 @@ void statusloop()
         	getcmds(i);
 		writestatus();
 		sleep(1.0);
+                i++;
 	}
 }
 
